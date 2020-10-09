@@ -22,6 +22,6 @@ from google.cloud.logging.handlers.handlers import setup_logging
 __all__ = [
     "AppEngineHandler",
     "CloudLoggingHandler",
-    "ContainerEngineHandler",
+    "KubernetesEngineHandler",
     "setup_logging",
 ]
