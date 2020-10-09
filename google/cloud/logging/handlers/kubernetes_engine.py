@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Logging handler for Google Container Engine (GKE).
+"""Logging handler for Google Kubernetes Engine (GKE).
 
 Formats log messages in a JSON format, so that Kubernetes clusters with the
 fluentd Google Cloud plugin installed can format their log messages so that
@@ -24,10 +24,10 @@ import logging.handlers
 from google.cloud.logging.handlers._helpers import format_stackdriver_json
 
 
-class ContainerEngineHandler(logging.StreamHandler):
+class KubernetesEngineHandler(logging.StreamHandler):
     """Handler to format log messages the format expected by GKE fluent.
 
-    This handler is written to format messages for the Google Container Engine
+    This handler is written to format messages for the Google Kubernetes Engine
     (GKE) fluentd plugin, so that metadata such as log level are properly set.
 
     :type name: str
@@ -38,7 +38,7 @@ class ContainerEngineHandler(logging.StreamHandler):
     """
 
     def __init__(self, name=None, stream=None):
-        super(ContainerEngineHandler, self).__init__(stream=stream)
+        super(KubernetesEngineHandler, self).__init__(stream=stream)
         self.name = name
 
     def format(self, record):
@@ -50,5 +50,5 @@ class ContainerEngineHandler(logging.StreamHandler):
         :rtype: str
         :returns: A JSON string formatted for GKE fluentd.
         """
-        message = super(ContainerEngineHandler, self).format(record)
+        message = super(KubernetesEngineHandler, self).format(record)
         return format_stackdriver_json(record, message)

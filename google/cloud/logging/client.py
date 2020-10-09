@@ -35,7 +35,7 @@ from google.cloud.logging._http import _MetricsAPI as JSONMetricsAPI
 from google.cloud.logging._http import _SinksAPI as JSONSinksAPI
 from google.cloud.logging.handlers import CloudLoggingHandler
 from google.cloud.logging.handlers import AppEngineHandler
-from google.cloud.logging.handlers import ContainerEngineHandler
+from google.cloud.logging.handlers import KubernetesEngineHandler
 from google.cloud.logging.handlers import setup_logging
 from google.cloud.logging.handlers.handlers import EXCLUDED_LOGGER_DEFAULTS
 
@@ -372,7 +372,7 @@ class Client(ClientWithProject):
         ):
             return AppEngineHandler(self, **kw)
         elif gke_cluster_name is not None:
-            return ContainerEngineHandler(**kw)
+            return KubernetesEngineHandler(**kw)
         else:
             return CloudLoggingHandler(self, **kw)
 
