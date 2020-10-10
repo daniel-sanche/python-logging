@@ -35,6 +35,7 @@ from google.cloud.logging._http import _MetricsAPI as JSONMetricsAPI
 from google.cloud.logging._http import _SinksAPI as JSONSinksAPI
 from google.cloud.logging.handlers import CloudLoggingHandler
 from google.cloud.logging.handlers import AppEngineHandler
+from google.cloud.logging.handlers import CloudFunctionsHandler
 from google.cloud.logging.handlers import CloudRunHandler
 from google.cloud.logging.handlers import KubernetesEngineHandler
 from google.cloud.logging.handlers import setup_logging
@@ -65,6 +66,20 @@ _CLOUD_RUN_ENV_VARS = (
 )
 """The list of environment variables known to be set for a Cloud Run environment.
 See https://cloud.google.com/run/docs/reference/container-contract#env-vars
+"""
+
+_CLOUD_FUNCTION_ENV_VARS = (
+    "ENTRY_POINT",
+    "FUNCTION_TRIGGER_TYPE",
+    "FUNCTION_NAME",
+    "FUNCTION_MEMORY_MB",
+    "FUNCTION_TIMEOUT_SEC",
+    "FUNCTION_IDENTITY",
+    "FUNCTION_REGION",
+)
+
+"""The list of environment variables known to be set for a Cloud Functions Python environment.
+See https://cloud.google.com/functions/docs/env-var#nodejs_6_nodejs_8_python_37_and_go_111
 """
 
 class Client(ClientWithProject):
@@ -378,6 +393,9 @@ class Client(ClientWithProject):
         is_cloud_run_service = all(
             envvar in os.environ for envvar in _CLOUD_RUN_ENV_VARS
         )
+        is_cloud_functions_service = all(
+            envvar in os.environ for envvar in _CLOUD_FUNCTION_ENV_VARS
+        )
 
         if (
             _APPENGINE_FLEXIBLE_ENV_VM in os.environ
@@ -386,6 +404,8 @@ class Client(ClientWithProject):
             return AppEngineHandler(self, **kw)
         elif gke_cluster_name is not None:
             return KubernetesEngineHandler(**kw)
+        elif is_cloud_functions_service:
+            return CloudFunctionsHandler(**kw)
         elif is_cloud_run_service:
             return CloudRunHandler(**kw)
         else:
