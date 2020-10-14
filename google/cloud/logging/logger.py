@@ -14,6 +14,7 @@
 
 """Define API Loggers."""
 
+from google.cloud.logging._helpers import default_log_entry_filter
 from google.cloud.logging.entries import LogEntry
 from google.cloud.logging.entries import ProtobufEntry
 from google.cloud.logging.entries import StructEntry
@@ -269,7 +270,7 @@ class Logger(object):
         if filter_ is not None:
             filter_ = "%s AND %s" % (filter_, log_filter)
         else:
-            filter_ = log_filter
+            filter_ = "%s AND %s" % (log_filter, default_log_entry_filter())
         return self.client.list_entries(
             projects=projects,
             filter_=filter_,

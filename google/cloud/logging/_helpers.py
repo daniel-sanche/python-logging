@@ -16,6 +16,10 @@
 
 import logging
 
+from datetime import datetime
+from datetime import timedelta
+from datetime import timezone
+
 import requests
 
 from google.cloud.logging.entries import LogEntry
@@ -50,9 +54,11 @@ _NORMALIZED_SEVERITIES = {
     logging.NOTSET: LogSeverity.DEFAULT,
 }
 
+_TIME_FORMAT = "%Y-%m-%dT%H:%M:%S.%fZ"
+"""Time format for timestamps used in API"""
+
 METADATA_URL = "http://metadata.google.internal./computeMetadata/v1/"
 METADATA_HEADERS = {"Metadata-Flavor": "Google"}
-
 
 def entry_from_resource(resource, client, loggers):
     """Detect correct entry type from resource and instantiate.
@@ -123,3 +129,14 @@ def _normalize_severity(stdlib_level):
     :returns: Corresponding Stackdriver severity.
     """
     return _NORMALIZED_SEVERITIES.get(stdlib_level, stdlib_level)
+
+def default_log_entry_filter():
+    """Sets the default behaviour for list requests when no filter is added.
+    By default, return entries from the last day
+
+    :rtype: str
+    :returns: sensible default filter string
+    """
+    yesterday = datetime.now(timezone.utc) - timedelta(days=1)
+    filter_ =  'timestamp>="{}"'.format(yesterday.strftime(_TIME_FORMAT))
+    return filter_

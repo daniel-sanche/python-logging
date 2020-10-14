@@ -28,6 +28,7 @@ else:
 import google.api_core.client_options
 from google.cloud.client import ClientWithProject
 from google.cloud.environment_vars import DISABLE_GRPC
+from google.cloud.logging._helpers import default_log_entry_filter
 from google.cloud.logging._helpers import retrieve_metadata_server
 from google.cloud.logging._http import Connection
 from google.cloud.logging._http import _LoggingAPI as JSONLoggingAPI
@@ -55,7 +56,6 @@ _APPENGINE_INSTANCE_ID = "GAE_INSTANCE"
 
 _GKE_CLUSTER_NAME = "instance/attributes/cluster-name"
 """Attribute in metadata server when in GKE environment."""
-
 
 class Client(ClientWithProject):
     """Client to bundle configuration needed for API requests.
@@ -248,6 +248,9 @@ class Client(ClientWithProject):
         """
         if projects is None:
             projects = [self.project]
+
+        if filter_ is None:
+            filter_ = default_log_entry_filter()
 
         return self.logging_api.list_entries(
             projects=projects,
