@@ -60,6 +60,7 @@ _TIME_FORMAT = "%Y-%m-%dT%H:%M:%S.%fZ"
 METADATA_URL = "http://metadata.google.internal./computeMetadata/v1/"
 METADATA_HEADERS = {"Metadata-Flavor": "Google"}
 
+
 def entry_from_resource(resource, client, loggers):
     """Detect correct entry type from resource and instantiate.
 
@@ -130,6 +131,7 @@ def _normalize_severity(stdlib_level):
     """
     return _NORMALIZED_SEVERITIES.get(stdlib_level, stdlib_level)
 
+
 def _add_defaults_to_filter(filter_):
     """Modify the input filter expression to add sensible defaults.
 
@@ -142,9 +144,9 @@ def _add_defaults_to_filter(filter_):
 
     # By default, requests should only return logs in the last 24 hours
     yesterday = datetime.now(timezone.utc) - timedelta(days=1)
-    time_filter =  'timestamp>="%s"' % yesterday.strftime(_TIME_FORMAT)
+    time_filter = 'timestamp>="%s"' % yesterday.strftime(_TIME_FORMAT)
     if filter_ is None:
         filter_ = time_filter
-    elif 'timestamp' not in filter_:
+    elif "timestamp" not in filter_:
         filter_ = "%s AND %s" % (filter_, time_filter)
     return filter_

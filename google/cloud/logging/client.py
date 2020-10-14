@@ -57,6 +57,7 @@ _APPENGINE_INSTANCE_ID = "GAE_INSTANCE"
 _GKE_CLUSTER_NAME = "instance/attributes/cluster-name"
 """Attribute in metadata server when in GKE environment."""
 
+
 class Client(ClientWithProject):
     """Client to bundle configuration needed for API requests.
 
