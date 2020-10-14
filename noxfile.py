@@ -30,21 +30,24 @@ UNIT_TEST_DEPS = (
     'webob',
 )
 
+BLACK_VERSION = "black==19.10b0"
+BLACK_PATHS = ["docs", "google", "tests", "noxfile.py", "setup.py"]
 
-@nox.session(python="3.7")
+DEFAULT_PYTHON_VERSION = "3.8"
+SYSTEM_TEST_PYTHON_VERSIONS = ["3.8"]
+UNIT_TEST_PYTHON_VERSIONS = ["3.6", "3.7", "3.8"]
+
+
+@nox.session(python=DEFAULT_PYTHON_VERSION)
 def lint(session):
     """Run linters.
 
     Returns a failure if the linters find linting errors or sufficiently
     serious code quality issues.
     """
-    session.install("flake8", "black")
+    session.install("flake8", BLACK_VERSION)
     session.run(
-        "black",
-        "--check",
-        "google",
-        "tests",
-        "docs",
+        "black", "--check", *BLACK_PATHS,
     )
     session.run("flake8", "google", "tests")
 
@@ -54,17 +57,18 @@ def blacken(session):
     """Run black.
 
     Format code to uniform standard.
+
+    This currently uses Python 3.6 due to the automated Kokoro run of synthtool.
+    That run uses an image that doesn't have 3.6 installed. Before updating this
+    check the state of the `gcp_ubuntu_config` we use for that Kokoro run.
     """
-    session.install("black")
+    session.install(BLACK_VERSION)
     session.run(
-        "black",
-        "google",
-        "tests",
-        "docs",
+        "black", *BLACK_PATHS,
     )
 
 
-@nox.session(python="3.7")
+@nox.session(python=DEFAULT_PYTHON_VERSION)
 def lint_setup_py(session):
     """Verify that setup.py is valid (including RST check)."""
     session.install("docutils", "pygments")
@@ -148,7 +152,7 @@ def system(session):
         *session.posargs)
 
 
-@nox.session(python="3.7")
+@nox.session(python=DEFAULT_PYTHON_VERSION)
 def cover(session):
     """Run the final coverage report.
 
@@ -156,16 +160,16 @@ def cover(session):
     test runs (not system test runs), and then erases coverage data.
     """
     session.install("coverage", "pytest-cov")
-    session.run("coverage", "report", "--show-missing", "--fail-under=100")
+    session.run("coverage", "report", "--show-missing", "--fail-under=99")
 
     session.run("coverage", "erase")
 
-@nox.session(python="3.7")
+@nox.session(python=DEFAULT_PYTHON_VERSION)
 def docs(session):
     """Build the docs for this library."""
 
     session.install("-e", ".")
-    session.install("sphinx<3.0.0", "alabaster", "recommonmark")
+    session.install("sphinx", "alabaster", "recommonmark")
 
     shutil.rmtree(os.path.join("docs", "_build"), ignore_errors=True)
     session.run(
