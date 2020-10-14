@@ -130,13 +130,21 @@ def _normalize_severity(stdlib_level):
     """
     return _NORMALIZED_SEVERITIES.get(stdlib_level, stdlib_level)
 
-def default_log_entry_filter():
-    """Sets the default behaviour for list requests when no filter is added.
-    By default, return entries from the last day
+def _add_defaults_to_filter(filter_):
+    """Modify the input filter expression to add sensible defaults.
+
+    :type filter_: str
+    :param filter_: The original filter expression
 
     :rtype: str
     :returns: sensible default filter string
     """
+
+    # By default, requests should only return logs in the last 24 hours
     yesterday = datetime.now(timezone.utc) - timedelta(days=1)
-    filter_ =  'timestamp>="{}"'.format(yesterday.strftime(_TIME_FORMAT))
+    time_filter =  'timestamp>="%s"' % yesterday.strftime(_TIME_FORMAT)
+    if filter_ is None:
+        filter_ = time_filter
+    elif 'timestamp' not in filter_:
+        filter_ = "%s AND %s" % (filter_, time_filter)
     return filter_

@@ -28,7 +28,7 @@ else:
 import google.api_core.client_options
 from google.cloud.client import ClientWithProject
 from google.cloud.environment_vars import DISABLE_GRPC
-from google.cloud.logging._helpers import default_log_entry_filter
+from google.cloud.logging._helpers import _add_defaults_to_filter
 from google.cloud.logging._helpers import retrieve_metadata_server
 from google.cloud.logging._http import Connection
 from google.cloud.logging._http import _LoggingAPI as JSONLoggingAPI
@@ -249,8 +249,7 @@ class Client(ClientWithProject):
         if projects is None:
             projects = [self.project]
 
-        if filter_ is None:
-            filter_ = default_log_entry_filter()
+        filter_ = _add_defaults_to_filter(filter_)
 
         return self.logging_api.list_entries(
             projects=projects,
