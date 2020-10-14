@@ -101,7 +101,7 @@ def default(session, django_dep=("django",)):
     )
 
 
-@nox.session(python=["2.7", "3.5", "3.6", "3.7"])
+@nox.session(python=UNIT_TEST_PYTHON_VERSIONS)
 def unit(session):
     """Run the unit test suite."""
 
