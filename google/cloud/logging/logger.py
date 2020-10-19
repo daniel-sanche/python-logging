@@ -14,6 +14,7 @@
 
 """Define API Loggers."""
 
+from google.cloud.logging._helpers import _add_defaults_to_filter
 from google.cloud.logging.entries import LogEntry
 from google.cloud.logging.entries import ProtobufEntry
 from google.cloud.logging.entries import StructEntry
@@ -114,8 +115,7 @@ class Logger(object):
         return Batch(self, client)
 
     def _do_log(self, client, _entry_class, payload=None, **kw):
-        """Helper for :meth:`log_empty`, :meth:`log_text`, etc.
-        """
+        """Helper for :meth:`log_empty`, :meth:`log_text`, etc."""
         client = self._require_client(client)
 
         # Apply defaults
@@ -243,6 +243,7 @@ class Logger(object):
         :param filter_:
             a filter expression. See
             https://cloud.google.com/logging/docs/view/advanced_filters
+            By default, a 24 hour filter is applied.
 
         :type order_by: str
         :param order_by: One of :data:`~google.cloud.logging.ASCENDING`
@@ -271,6 +272,7 @@ class Logger(object):
             filter_ = "%s AND %s" % (filter_, log_filter)
         else:
             filter_ = log_filter
+        filter_ = _add_defaults_to_filter(filter_)
         return self.client.list_entries(
             projects=projects,
             filter_=filter_,
